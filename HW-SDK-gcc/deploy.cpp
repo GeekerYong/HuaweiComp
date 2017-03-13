@@ -73,7 +73,7 @@ void init(char* topo[MAX_EDGE_NUM], int line_num)
         graphs.addEdge(from, to, cap, cost);
 
         costNeed[to] = str2Int(resultBuff[2]);
-        printf("%d %d %d\n", to, from, cap, temp);
+        //printf("%d %d %d\n", to, from, costNeed[to]);
     }
     //graphs.init();
 }
