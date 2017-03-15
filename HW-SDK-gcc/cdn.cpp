@@ -3,10 +3,6 @@
 #include ".\\lib\\lib_time.h"
 #include "stdio.h"
 
-#include <string.h>
-#include <iostream>
-using namespace std;
-
 int main(int argc, char *argv[])
 {
     print_time("Begin");

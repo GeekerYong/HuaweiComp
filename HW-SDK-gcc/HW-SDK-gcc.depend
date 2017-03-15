@@ -1,11 +1,9 @@
 # depslib dependency file v1.0
-1489374289 source:d:\code\c++\hw-sdk-gcc\cdn.cpp
+1489485010 source:d:\code\c++\hw-sdk-gcc\cdn.cpp
 	"deploy.h"
 	".\\lib\\lib_io.h"
 	".\\lib\\lib_time.h"
 	"stdio.h"
-	<string.h>
-	<iostream>
 
 1489134934 d:\code\c++\hw-sdk-gcc\deploy.h
 	".\\lib\\lib_io.h"
@@ -14,9 +12,8 @@
 
 1484529734 d:\code\c++\hw-sdk-gcc\\lib\\lib_time.h
 
-1489373314 source:d:\code\c++\hw-sdk-gcc\deploy.cpp
+1489572887 source:d:\code\c++\hw-sdk-gcc\deploy.cpp
 	"deploy.h"
-	<stdio.h>
 	"MCMF.h"
 
 1484615570 source:d:\code\c++\hw-sdk-gcc\io.cpp
@@ -30,9 +27,10 @@
 	<unistd.h>
 	<signal.h>
 
-1489373132 d:\code\c++\hw-sdk-gcc\mcmf.h
+1489587569 d:\code\c++\hw-sdk-gcc\mcmf.h
 	<cstdio>
 	<algorithm>
 	<cstring>
 	<queue>
+	<iostream>
 
