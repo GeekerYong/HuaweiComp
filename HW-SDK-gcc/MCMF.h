@@ -116,4 +116,6 @@ void init(char* topo[MAX_EDGE_NUM], int line_num);
 //用来求出结果的函数
 void serverChooseDP();
 
-void minCost(MCMF temp, int s, int t, int costNeed);
+int multiServerMinCost(vector<int> serverNodes);
+
+int minCost(MCMF temp, int s, int t, int costNeed);
