@@ -12,7 +12,7 @@
 
 1484529734 d:\code\c++\hw-sdk-gcc\\lib\\lib_time.h
 
-1489590310 source:d:\code\c++\hw-sdk-gcc\deploy.cpp
+1489760970 source:d:\code\c++\hw-sdk-gcc\deploy.cpp
 	"deploy.h"
 	"MCMF.h"
 
@@ -27,7 +27,7 @@
 	<unistd.h>
 	<signal.h>
 
-1489589626 d:\code\c++\hw-sdk-gcc\mcmf.h
+1489759273 d:\code\c++\hw-sdk-gcc\mcmf.h
 	<cstdio>
 	<algorithm>
 	<cstring>

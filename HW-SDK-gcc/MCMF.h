@@ -11,6 +11,7 @@ const int lineMax = 20; //每行的字符串的最大值
 const int nodeMax = 1005; //网络或者消费节点的最大值
 const int INF = 0x7fffffff;
 const char* splitStr = " \n";
+const int maxLineNum = 1005 * 1005;
 
 //边的数据结构
 struct edge
@@ -29,6 +30,10 @@ struct MCMF
     int p[nMax]; //上一条弧
     int a[nMax]; //可以改进的量
 
+    char** topo; //用于打印结果
+    vector<int> result; //用于存储结果的路径
+    int resultCount = 0;
+
     void init(int n)
     {
         this -> n = n;
@@ -45,7 +50,7 @@ struct MCMF
         G[to].push_back(m - 1);
     }
 
-    bool bellManFord(int s, int t, int &flow, int &cost, int costNeed)
+    bool bellManFord(int s, int t, int &flow, int &cost, int costNeed, int isPr)
     {
         for (int i = 0; i < n; i ++) d[i] = INF;
         memset(inq, 0, sizeof(inq));
@@ -85,11 +90,26 @@ struct MCMF
         flow += a[t];
         cost += d[t] * a[t];
         int u = t;
+
+        resultCount = 0;
+        result.clear();
         while (u != s)
         {
             edges[p[u]].flow += a[t];
             edges[p[u]^1].flow -= a[t];
             u = edges[p[u]].from;
+
+            if(isPr == 1 && u != s)
+            {
+                resultCount ++;
+                result.push_back(u);
+            }
+        }
+        //添加流量
+        if(isPr == 1)
+        {
+            resultCount ++;
+            result.push_back(a[t]);
         }
 
         if(flag == 1) return false;
@@ -119,3 +139,8 @@ void serverChooseDP();
 int multiServerMinCost(vector<int> serverNodes);
 
 int minCost(MCMF temp, int s, int t, int costNeed);
+
+//用于输出结果的函数
+char* int2Str(int temp);
+
+char* print();

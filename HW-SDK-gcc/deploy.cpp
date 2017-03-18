@@ -7,7 +7,9 @@ int costNeed[nMax]; //用来存储每个消费节点的带宽需求
 int costNeedTotal;
 int totalIn, totalOut;
 
-int flow = 0, cost = 0, maxflow = 0, maxflowNum = -1; //存储流量和消费
+int flow = 0, cost = 0; //用来存储全局的流量和消费
+int maxTempFlow = 0, maxTempFlowNum = -1; //存储流量和消费
+int minTempCost = INF, minTempCostNum = -1;
 
 int resultCost = INF; //存放花费最终结果
 vector<int> resultArr; //存放最终的数组
@@ -64,11 +66,12 @@ void init(char* topo[MAX_EDGE_NUM], int line_num)
         cap = str2Int(resultBuff[2]);
         cost = str2Int(resultBuff[3]);
         graphs.addEdge(from, to, cap, cost);
-        //printf("%d %d %d %d\n", from, to, cap, cost);
     }
 
     //添加每个消费节点，并添加一个总汇点
     costNeedTotal = 0;
+    totalIn = netCount + costCount;
+    totalOut = netCount + costCount + 1;
     memset(costNeed, 0, sizeof(costNeed));
     for(int i = edgeCount + 5; i < edgeCount + costCount + 5; i ++)
     {
@@ -78,10 +81,8 @@ void init(char* topo[MAX_EDGE_NUM], int line_num)
         costNeed[to] = str2Int(resultBuff[2]);
         cap = INF; cost = 0;
         graphs.addEdge(from, to, cap, cost);
-        //printf("%d %d %d %d\n", from, to, cap, cost);
 
         //添加一个总的汇点
-        totalIn = netCount + costCount;
         cap = costNeed[to];
         costNeedTotal += costNeed[to];
         graphs.addEdge(to, totalIn, cap, cost);
@@ -103,7 +104,10 @@ bool isRepeat(vector<int> temp, int a)
 //用来处理服务器选址，暴力枚举
 void serverChooseDP()
 {
-    memset(serverDp, INF, sizeof(serverDp));
+    memset(serverDp, INF, sizeof(int));
+    for(int i = 0; i < costCount; i ++)
+        for(int j = 0; j < netCount; j ++)
+            serverDp[i][j] = INF;
 
     int tempCost, tempTotal;
     for(int i = 0; i < netCount; i ++) //初始化第一行的数据
@@ -112,7 +116,15 @@ void serverChooseDP()
         tempCost = multiServerMinCost(serverStatus[0][i]);
 
         if(tempCost == INF) serverDp[0][i] = INF;
-        else serverDp[0][i] = cost + serverCost * serverStatus[0][i].size();
+        else
+        {
+            serverDp[0][i] = cost + serverCost * serverStatus[0][i].size();
+            if(serverDp[0][i] < resultCost)
+            {
+                resultCost = serverDp[0][i];
+                resultArr = serverStatus[0][i];
+            }
+        }
     }
 
     bool isRe;
@@ -121,7 +133,8 @@ void serverChooseDP()
     {
         for(int j = 0; j < netCount; j ++) //对第i层的每个节点进行枚举
         {
-            maxflow = 0, maxflowNum = -1;
+            maxTempFlow = 0, maxTempFlowNum = -1;
+            //minTempCost = INF, minTempCostNum = -1;
             for(int k = 0; k < netCount; k ++) //对i-1层每个节点进行枚举
             {
                 isRe = isRepeat(serverStatus[i - 1][k], j);
@@ -130,15 +143,14 @@ void serverChooseDP()
                 tempArr = serverStatus[i - 1][k];
                 tempArr.push_back(j);
                 tempCost = multiServerMinCost(tempArr);
-                //若不存在路径，挑选流量最大的K来作为DP状态数组的更新,这个部分可以优化
-                //cout << flow << " " << cost << endl;
+                //若不存在路径，挑选流量最大的K来作为DP状态数组的更新,这个部分可以修改
                 if(tempCost == INF)
                 {
                     serverDp[i][j] = INF;
-                    if(maxflow < flow)
+                    if(maxTempFlow < flow)
                     {
-                        maxflow = flow;
-                        maxflowNum = k;
+                        maxTempFlow = flow;
+                        maxTempFlowNum = k;
                     }
                 }
                 else
@@ -152,16 +164,21 @@ void serverChooseDP()
                     }
                 }
             }
-
+            //选择最小消费的路径
             if(serverDp[i][j] == INF)
             {
-                serverStatus[i][j] = serverStatus[i-1][maxflowNum];
+                serverStatus[i][j] = serverStatus[i-1][maxTempFlowNum];
                 serverStatus[i][j].push_back(j);
+            }
+            //更新最终结果
+            if(serverDp[i][j] < resultCost)
+            {
+                resultCost = serverDp[i][j];
+                resultArr = serverStatus[i][j];
             }
         }
     }
-
-    //对最后一层的节点进行总的汇总
+    //对最后一层的节点进行汇总
     for(int i = 0; i < netCount; i ++)
     {
         if(serverDp[costCount - 1][i] < resultCost)
@@ -169,7 +186,6 @@ void serverChooseDP()
             resultCost = serverDp[costCount - 1][i];
             resultArr = serverStatus[costCount - 1][i];
         }
-        //printf("%d\n", serverDp[costCount - 1][i]);
     }
 }
 
@@ -177,8 +193,6 @@ void serverChooseDP()
 int multiServerMinCost(vector<int> serverNodes)
 {
     MCMF temp = graphs;
-    totalOut = netCount + costCount + 1;
-
     //更新服务器周边对应的边的权值
     for(int i = 0; i < serverNodes.size(); i ++)
     {
@@ -186,9 +200,8 @@ int multiServerMinCost(vector<int> serverNodes)
         int from = totalOut; int to = serverNodes[i];
         int cap = INF; int cost = 0;
         temp.addEdge(from, to, cap, cost);
-        cout << serverNodes[i] << " ";
+        //cout << serverNodes[i] << " ";
     }
-    cout << endl;
     //每次都要初始化flow和cost
     flow = cost = 0;
     return minCost(temp, totalOut, totalIn, costNeedTotal);
@@ -196,9 +209,56 @@ int multiServerMinCost(vector<int> serverNodes)
 
 int minCost(MCMF temp, int s, int t, int costNeed)
 {
-    while(temp.bellManFord(s, t, flow, cost, costNeed));
+    while(temp.bellManFord(s, t, flow, cost, costNeed, 0));
     if(flow < costNeedTotal) return INF;
     else return cost;
+}
+
+char* int2Str(int temp)
+{
+    char* b = new char;
+    sprintf(b, "%d", temp);
+    return b;
+}
+
+char* print()
+{
+    char* topo = (char*)malloc(maxLineNum);
+    char* strTemp = (char*)malloc(maxLineNum - 10);
+
+    //更新服务器周边对应的边的权值
+    for(int i = 0; i < resultArr.size(); i ++)
+    {
+        //添加超级源点和服务器之间的边
+        int from = totalOut; int to = resultArr[i];
+        int cap = INF; int cost = 0;
+        graphs.addEdge(from, to, cap, cost);
+    }
+
+    int temp = 0;
+    char* space = (char*)" ";
+    char* enter = (char*)"\n";
+
+    flow = cost = 0;
+    while(graphs.bellManFord(totalOut, totalIn, flow, cost, costNeedTotal, 1))
+    {
+        graphs.result[0] -= netCount;
+        for(int i = graphs.resultCount - 2; i >= 0; i --)
+        {
+            strTemp = strcat(strTemp, int2Str(graphs.result[i]));
+            strTemp = strcat(strTemp, space);
+        }
+        strTemp = strcat(strTemp, int2Str(graphs.result[graphs.resultCount - 1]));
+        strTemp = strcat(strTemp, enter);
+        temp ++;
+    }
+
+    topo = strcat(topo, int2Str(temp));
+    topo = strcat(topo, enter);
+    topo = strcat(topo, enter);
+    topo = strcat(topo, strTemp);
+
+    return topo;
 }
 
 //你要完成的功能总入口
@@ -206,29 +266,26 @@ void deploy_server(char * topo[MAX_EDGE_NUM], int line_num,char * filename)
 {
     init(topo, line_num);
 
-    /*
-    vector<int> test;
-    test.push_back(38);
-    test.push_back(13);
-    test.push_back(22);
-    test.push_back(43);
-    test.push_back(34);
-    test.push_back(6);
-    test.push_back(36);
-    test.push_back(3);
-    test.push_back(14);
-    multiServerMinCost(test);
-    printf("%d\n", multiServerMinCost(test));
-    */
-
     serverChooseDP();
     multiServerMinCost(resultArr);
-    printf("%d\n", resultCost);
+//    for(int i = 0; i < resultArr.size(); i ++)
+//        cout << resultArr[i] << " ";
+//    cout << endl;
+//    printf("%d\n", resultCost);
 
-	// 需要输出的内容
-	char * topo_file = (char *)"17\n\n0 8 0 20\n21 8 0 20\n9 11 1 13\n21 22 2 20\n23 22 2 8\n1 3 3 11\n24 3 3 17\n27 3 3 26\n24 3 3 10\n18 17 4 11\n1 19 5 26\n1 16 6 15\n15 13 7 13\n4 5 8 18\n2 25 9 15\n0 7 10 10\n23 24 11 23";
+//    resultCost = 2408;
+//    resultArr.push_back(38);
+//    resultArr.push_back(3);
+//    resultArr.push_back(15);
+//    resultArr.push_back(0);
+//    resultArr.push_back(43);
+//    resultArr.push_back(22);
 
-	// 直接调用输出文件的方法输出到指定文件中(ps请注意格式的正确性，如果有解，第一行只有一个数据；第二行为空；第三行开始才是具体的数据，数据之间用一个空格分隔开)
+    char* topo_file = print();
+
+	//需要输出的内容
+	//char * topo_file = (char *)"17\n\n0 8 0 20\n21 8 0 20\n9 11 1 13\n21 22 2 20\n23 22 2 8\n1 3 3 11\n24 3 3 17\n27 3 3 26\n24 3 3 10\n18 17 4 11\n1 19 5 26\n1 16 6 15\n15 13 7 13\n4 5 8 18\n2 25 9 15\n0 7 10 10\n23 24 11 23";
+
+	//直接调用输出文件的方法输出到指定文件中(ps请注意格式的正确性，如果有解，第一行只有一个数据；第二行为空；第三行开始才是具体的数据，数据之间用一个空格分隔开)
 	write_result(topo_file, filename);
-
 }
