@@ -1,0 +1,1 @@
+/bin/c++    -O0 -Wall -g -ggdb -std=c++11    CMakeFiles/cdn.dir/cdn.cpp.o CMakeFiles/cdn.dir/deploy.cpp.o CMakeFiles/cdn.dir/io.cpp.o  -o /home/chenyunfei/HW/bin/cdn -rdynamic 
