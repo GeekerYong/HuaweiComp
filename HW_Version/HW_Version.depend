@@ -1,0 +1,85 @@
+# depslib dependency file v1.0
+1490271782 source:e:\codeblock\hw_version\cdn.cpp
+	"deploy.h"
+	"lib_io.h"
+	"lib_time.h"
+	"stdio.h"
+
+1490271782 e:\codeblock\hw_version\deploy.h
+	"lib_io.h"
+
+1490271782 e:\codeblock\hw_version\lib_io.h
+
+1490271782 e:\codeblock\hw_version\lib_time.h
+
+1490271782 source:e:\codeblock\hw_version\io.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<time.h>
+	<sys/timeb.h>
+	<errno.h>
+	<unistd.h>
+	<signal.h>
+
+1490271782 source:d:\code\c++\hw_version\cdn.cpp
+	"deploy.h"
+	"lib_io.h"
+	"lib_time.h"
+	"stdio.h"
+
+1490271782 d:\code\c++\hw_version\deploy.h
+	"lib_io.h"
+
+1490271782 d:\code\c++\hw_version\lib_io.h
+
+1490271782 d:\code\c++\hw_version\lib_time.h
+
+1490672349 source:d:\code\c++\hw_version\deploy.cpp
+	"deploy.h"
+	"MCMF.h"
+	"sstream"
+	"anneal.h"
+
+1490672187 d:\code\c++\hw_version\mcmf.h
+	<cstdio>
+	<algorithm>
+	<cstring>
+	<queue>
+	<iostream>
+
+1490666310 d:\code\c++\hw_version\anneal.h
+	<math.h>
+	<time.h>
+	<stdlib.h>
+
+1490271782 source:d:\code\c++\hw_version\io.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<time.h>
+	<sys/timeb.h>
+	<errno.h>
+	<unistd.h>
+	<signal.h>
+
+1490933119 source:e:\codeblock\hw_version\deploy.cpp
+	"deploy.h"
+	"MCMF.h"
+	"sstream"
+	"anneal.h"
+
+1490884311 e:\codeblock\hw_version\mcmf.h
+	<cstdio>
+	<algorithm>
+	<cstring>
+	<queue>
+	<iostream>
+
+1490884311 e:\codeblock\hw_version\anneal.h
+	<math.h>
+	<time.h>
+	<stdlib.h>
+
